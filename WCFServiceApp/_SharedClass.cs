@@ -288,7 +288,7 @@ namespace WCFServiceApp
                     _existUserID = sqlDataReader.GetDecimal(0);
                 return (Decimal.Compare(userID, _existUserID) == 0);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }
@@ -325,5 +325,71 @@ namespace WCFServiceApp
                 sqlConn.Close();
             }
         }
+
+        /// <summary>
+        /// GAME API
+        /// </summary>
+        /// <param name="auth_token"></param>
+        /// <returns></returns>
+        public static List<string> GetAllAvailableCharacterNames(string auth_token)
+        {
+            decimal userID = GetUserIDInAuthToken(auth_token);
+            SqlConnection sqlConn = ObtainConnectionString();
+            string query = @"SELECT charName FROM Character WHERE userID = @UserID";
+            List<string> allCharacterNames = new List<string>();
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@UserID", userID);
+                SqlDataReader sqlDataReader = command.ExecuteReader();
+               
+                while (sqlDataReader.Read())
+                    allCharacterNames.Add(sqlDataReader.GetString(0)) ;
+                return allCharacterNames;
+            }
+            catch (Exception ex)
+            {
+
+                allCharacterNames.Add("Exception: GetAllAvailableCharacterNames: " + ex.Message.ToString());
+                return allCharacterNames;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+        public static decimal GetUserIDInAuthToken(string auth_token)
+        {
+            SqlConnection sqlConn = ObtainConnectionString();
+            string query = @"SELECT userID FROM AuthToken WHERE auth_token = @Auth_Token";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@Auth_Token", auth_token);
+                SqlDataReader sqlDataReader = command.ExecuteReader();
+                decimal userID = -1;
+                while (sqlDataReader.Read())
+                    userID = sqlDataReader.GetDecimal(0);
+                return userID;
+            }
+            catch (Exception)
+            {
+                return -1;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
     }
 }

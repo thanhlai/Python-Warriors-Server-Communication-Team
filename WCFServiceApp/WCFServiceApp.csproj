@@ -63,6 +63,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="GameAPI.svc" />
     <Content Include="LoginService.svc" />
     <Content Include="RegisterService.svc" />
     <Content Include="Web.config">
@@ -70,6 +71,11 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Character.cs" />
+    <Compile Include="GameAPI.svc.cs">
+      <DependentUpon>GameAPI.svc</DependentUpon>
+    </Compile>
+    <Compile Include="IGameAPI.cs" />
     <Compile Include="IRegisterService.cs" />
     <Compile Include="ILoginService.cs" />
     <Compile Include="Player.cs" />
