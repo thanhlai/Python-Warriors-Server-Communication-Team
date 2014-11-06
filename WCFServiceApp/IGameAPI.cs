@@ -17,7 +17,35 @@ namespace WCFServiceApp
         RequestFormat = WebMessageFormat.Json,
         ResponseFormat = WebMessageFormat.Json,
         BodyStyle = WebMessageBodyStyle.Wrapped,
-        UriTemplate = "gameapi/getcharacter")]
+        UriTemplate = "gameapi/getallavailablecharacternames")]
         List<string> GetAllAvailableCharacterNames();
+
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+        RequestFormat = WebMessageFormat.Json,
+        ResponseFormat = WebMessageFormat.Json,
+        BodyStyle = WebMessageBodyStyle.Wrapped,
+        UriTemplate = "gameapi/getcharacter/{charName}")]
+        Character GetCharacter(string charName);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+        RequestFormat = WebMessageFormat.Json,
+        ResponseFormat = WebMessageFormat.Json,
+        BodyStyle = WebMessageBodyStyle.Wrapped,
+        UriTemplate = "gameapi/getitem/{itemID}")]
+        Item GetItem(string itemID);
+
+
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+        RequestFormat = WebMessageFormat.Json,
+        ResponseFormat = WebMessageFormat.Json,
+        BodyStyle = WebMessageBodyStyle.Wrapped,
+        UriTemplate = "gameapi/getallavailableitems")]
+        List<string> GetAllItemsIDBelongToUser();
+
     }
 }

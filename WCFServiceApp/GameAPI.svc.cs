@@ -16,9 +16,32 @@ namespace WCFServiceApp
         List<string> IGameAPI.GetAllAvailableCharacterNames()
         {
             IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
-
             string applicationheader = iwrc.Headers["X-Auth-Token"];
             return _SharedClass.GetAllAvailableCharacterNames(applicationheader);    //it is auth_token
+        }
+
+
+        Character IGameAPI.GetCharacter(string charName)
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            return _SharedClass.GetCharacter(charName, applicationheader);
+        }
+
+
+        Item IGameAPI.GetItem(string itemID)
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            return _SharedClass.GetItem(itemID, applicationheader);
+        }
+
+
+        List<string> IGameAPI.GetAllItemsIDBelongToUser()
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            return _SharedClass.GetAllItemsIDBelongToUser(applicationheader);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -20,8 +21,8 @@ namespace WCFServiceApp
             SqlConnection sqlConn = ObtainConnectionString();
             string loginQuery = @"SELECT Count(*) FROM Account 
                      WHERE (userName = @Username OR email = @Username) AND password = @Password";
-//            string emailQuery = @"SELECT userID FROM Account 
-//                     WHERE (userName = @Username OR email = @Username) AND password = @Password";
+            //            string emailQuery = @"SELECT userID FROM Account 
+            //                     WHERE (userName = @Username OR email = @Username) AND password = @Password";
             try
             {
                 SqlCommand loginCommand = new SqlCommand(loginQuery, sqlConn);
@@ -49,7 +50,7 @@ namespace WCFServiceApp
                         Balance = GetDecimalFromAccountTable("balance", username, passwordHash)
                     };
                 }
-                return new Player() { Username = "INVALID"};
+                return new Player() { Username = "INVALID" };
 
             }
             catch (Exception)
@@ -121,14 +122,14 @@ namespace WCFServiceApp
                 {
                     sqlConn.Open();
                 }
-                    SqlCommand emailCommand = new SqlCommand(emailQuery, sqlConn);
-                    emailCommand.Parameters.AddWithValue("@Username", username);
-                    emailCommand.Parameters.AddWithValue("@Password", passwordHash);
-                    SqlDataReader sqlDataReader = emailCommand.ExecuteReader();
-                    string _email = "";
-                    while (sqlDataReader.Read())
-                        _email = sqlDataReader.GetString(0);
-                    return _email;
+                SqlCommand emailCommand = new SqlCommand(emailQuery, sqlConn);
+                emailCommand.Parameters.AddWithValue("@Username", username);
+                emailCommand.Parameters.AddWithValue("@Password", passwordHash);
+                SqlDataReader sqlDataReader = emailCommand.ExecuteReader();
+                string _email = "";
+                while (sqlDataReader.Read())
+                    _email = sqlDataReader.GetString(0);
+                return _email;
             }
             catch (Exception)
             {
@@ -170,10 +171,10 @@ namespace WCFServiceApp
 
         public static string GenerateAuthToken(string username, string password)
         {
-            decimal userID  = GetDecimalFromAccountTable("userID", username, HashPassword(password));
+            decimal userID = GetDecimalFromAccountTable("userID", username, HashPassword(password));
             if (UserIDExistsInAuthToken(userID))
-              return UpdateAndReturnAuthToken(userID); //Update and return token
-              
+                return UpdateAndReturnAuthToken(userID); //Update and return token
+
             //return the new token
             return NewAuthToken(userID);
         }
@@ -314,7 +315,7 @@ namespace WCFServiceApp
                 decimal userID = -1;
                 while (sqlDataReader.Read())
                     userID = sqlDataReader.GetDecimal(0);
-                return userID; 
+                return userID;
             }
             catch (Exception)
             {
@@ -346,9 +347,9 @@ namespace WCFServiceApp
                 SqlCommand command = new SqlCommand(query, sqlConn);
                 command.Parameters.AddWithValue("@UserID", userID);
                 SqlDataReader sqlDataReader = command.ExecuteReader();
-               
+
                 while (sqlDataReader.Read())
-                    allCharacterNames.Add(sqlDataReader.GetString(0)) ;
+                    allCharacterNames.Add(sqlDataReader.GetString(0));
                 return allCharacterNames;
             }
             catch (Exception ex)
@@ -356,6 +357,38 @@ namespace WCFServiceApp
 
                 allCharacterNames.Add("Exception: GetAllAvailableCharacterNames: " + ex.Message.ToString());
                 return allCharacterNames;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+        public static List<string> GetAllItemsIDBelongToUser(string auth_token)
+        {
+            decimal userID = GetUserIDInAuthToken(auth_token);
+            SqlConnection sqlConn = ObtainConnectionString();
+            string query = @"SELECT itemID FROM Item WHERE userID = @UserID";
+            List<string> allItemIDs = new List<string>();
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@UserID", userID);
+                SqlDataReader sqlDataReader = command.ExecuteReader();
+
+                while (sqlDataReader.Read())
+                    allItemIDs.Add(sqlDataReader.GetString(0));
+                return allItemIDs;
+            }
+            catch (Exception ex)
+            {
+
+                allItemIDs.Add("Exception: GetAllItemsIDBelongToUser: " + ex.Message.ToString());
+                return allItemIDs;
             }
             finally
             {
@@ -380,6 +413,167 @@ namespace WCFServiceApp
                 while (sqlDataReader.Read())
                     userID = sqlDataReader.GetDecimal(0);
                 return userID;
+            }
+            catch (Exception)
+            {
+                return -1;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+        public static Character GetCharacter(string charName, string auth_token)
+        {
+            decimal userID = GetLoggedInUserID(auth_token);
+            // Check if the requested character name is belong to the userID laa
+            // Using Linq ^^
+            if (!charName.Equals(GetAllAvailableCharacterNames(auth_token).Where(x => x.Contains(charName)).FirstOrDefault()))
+                return null;
+
+            return new Character()
+            {
+                CharName = charName,
+                Id = userID,
+                CharacterObj = GetCharacterObj("character", charName, userID),
+                Stage = GetCharacterObj("stage", charName, userID),
+                StageExp = GetStageExp(charName, userID),
+                Updated = GetUpdated(charName, userID)
+            };
+        }
+
+
+        public static string GetCharacterObj(string objColumn, string charName, decimal userID)
+        {
+            SqlConnection sqlConn = ObtainConnectionString();
+            object characterObj = null;
+            string query = @"SELECT " + objColumn + " FROM Character WHERE userID = @UserID AND charName = @CharName";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@UserID", userID);
+                command.Parameters.AddWithValue("@CharName", charName);
+                SqlDataReader sqlDataReader = command.ExecuteReader();
+                while (sqlDataReader.Read())
+                    characterObj = sqlDataReader.GetValue(0);
+                return JsonConvert.SerializeObject(characterObj);
+                /*
+                This web service:
+                    +Retrieves a dataset from our database
+                    +Uses JsonConvert.SerializeObject() to serialize the object and returns that data to a user's local application as a string
+                Then the client's local application:
+                    +Uses JsonConvert.DeserializeObject<DataSet>() to convert the object back into a System.Data.DataSet
+                 */
+            }
+            catch (Exception ex)
+            {
+                characterObj = ex.Message;
+                return JsonConvert.SerializeObject(characterObj);
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+        public static decimal GetStageExp(string charName, decimal userID)
+        {
+            SqlConnection sqlConn = ObtainConnectionString();
+            string query = @"SELECT stageExp FROM Character WHERE charName = @CharName AND userID = @UserID";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@CharName", charName);
+                command.Parameters.AddWithValue("@UserID", userID);
+                SqlDataReader sqlDataReader = command.ExecuteReader();
+                decimal stageExp = -1;
+                while (sqlDataReader.Read())
+                    stageExp = sqlDataReader.GetDecimal(0);
+                return stageExp;
+            }
+            catch (Exception)
+            {
+                return -1;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+        public static string GetUpdated(string charName, decimal userID)
+        {
+            SqlConnection sqlConn = ObtainConnectionString();
+            DateTime? updated = null;
+            string query = @"SELECT updated FROM Character WHERE charName = @CharName AND userID = @UserID";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@CharName", charName);
+                command.Parameters.AddWithValue("@UserID", userID);
+                SqlDataReader sqlDataReader = command.ExecuteReader();
+                while (sqlDataReader.Read())
+                    updated = sqlDataReader.GetDateTime(0);
+                return JsonConvert.SerializeObject(updated);
+            }
+            catch (Exception ex)
+            {
+                return JsonConvert.SerializeObject(updated + ex.Message);
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+        public static Item GetItem(string itemID, string auth_token)
+        {
+            decimal userID = GetLoggedInUserID(auth_token);
+
+            //check if the itemID is belong to the userID
+            if (!itemID.Equals(GetAllItemsIDBelongToUser(auth_token).Where(x => x.Contains(itemID)).FirstOrDefault()))
+                return null;
+
+            return new Item()
+            {
+                UserID = userID,
+                ItemID = itemID,
+                Quantity = GetItemQuantity(userID, itemID)
+            };
+
+        }
+
+        public static decimal GetItemQuantity(decimal userID, string itemID)
+        {
+            SqlConnection sqlConn = ObtainConnectionString();
+            decimal quantity = -1;
+            string query = @"SELECT quantity FROM Item WHERE itemID = @ItemID AND userID = @UserID";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@ItemID", itemID);
+                command.Parameters.AddWithValue("@UserID", userID);
+                SqlDataReader sqlDataReader = command.ExecuteReader();
+                while (sqlDataReader.Read())
+                    quantity = sqlDataReader.GetDecimal(0);
+                return quantity;
             }
             catch (Exception)
             {

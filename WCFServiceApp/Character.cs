@@ -25,20 +25,22 @@ namespace WCFServiceApp
         private string _charName;
 
         [DataMember(Name = "Character")]
-        public object CharacterObj 
+        [Newtonsoft.Json.JsonProperty(PropertyName = "Character")]
+        public string CharacterObj 
         {
             get { return _character; }
             set { _character = value; }
         }
-        private object _character;
+        private string _character;
 
         [DataMember(Name = "Stage")]
-        public object Stage
+        [Newtonsoft.Json.JsonProperty(PropertyName = "Stage")]
+        public string Stage
         {
             get { return _stage; }
             set { _stage = value; }
         }
-        private object _stage;
+        private string _stage;
 
         [DataMember(Name = "Stage Exp")]
         public decimal StageExp 
@@ -49,11 +51,11 @@ namespace WCFServiceApp
         private decimal _stageExp;
 
         [DataMember(Name = "Updated")]
-        public DateTime Updated 
+        public string Updated 
         {
             get { return _updated; }
             set { _updated = value; }
         }
-        private DateTime _updated;
+        private string _updated;
     }
 }

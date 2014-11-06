@@ -21,7 +21,10 @@ namespace WCFServiceApp
         /// <returns></returns>
         Player ILoginService.SendToLoginValidation(string username, string password)
         {
-            return LoginValidation(username, _SharedClass.HashPassword(password));
+            Player player = LoginValidation(username, _SharedClass.HashPassword(password));
+            if (player.PasswordHash.Equals(null))
+                return null;
+            return player;
         }
         /// <summary>
         /// Access to the database and retrieve the row (all the information) that 
