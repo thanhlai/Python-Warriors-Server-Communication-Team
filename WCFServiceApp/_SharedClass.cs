@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Security.Cryptography;
+using System.ServiceModel.Web;
 using System.Text;
 using System.Web;
 
@@ -364,6 +365,7 @@ namespace WCFServiceApp
             }
         }
 
+
         public static List<string> GetAllItemsIDBelongToUser(string auth_token)
         {
             decimal userID = GetUserIDInAuthToken(auth_token);
@@ -539,10 +541,74 @@ namespace WCFServiceApp
             }
         }
 
+        public static decimal GetUserIdbyUserName(string userName)
+        {
+            SqlConnection sqlConn = ObtainConnectionString();
+            string query = @"SELECT userId FROM Account WHERE userName = @userName";
+            
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@userName", userName);
+                SqlDataReader sqlDataReader = command.ExecuteReader();
+                decimal userId = -1;
+                while (sqlDataReader.Read())
+                    userId = sqlDataReader.GetDecimal(0);
+                return userId;
+            }
+            catch (Exception)
+            {
+
+                return -2;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+        public static List<string> GetAllItemIdByUsername(string username)
+        {            
+            // Get userId from the userName
+            decimal userId = GetUserIdbyUserName(username);
+            // Get all item Id from Item table by userId
+            SqlConnection sqlConn = ObtainConnectionString();
+            string query = @"SELECT itemId FROM Item WHERE userId = @userId";
+            List<string> allItemIds = new List<string>();
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@userId", userId);
+                SqlDataReader sqlDataReader = command.ExecuteReader();
+
+                while (sqlDataReader.Read())
+                    allItemIds.Add(sqlDataReader.GetString(0));
+                return allItemIds;
+            }
+            catch (Exception ex)
+            {
+
+                allItemIds.Add("Exception: GetAllItemIdByUsername: " + ex.Message.ToString());
+                return allItemIds;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+ 
         public static Item GetItem(string itemID, string auth_token)
         {
             decimal userID = GetLoggedInUserID(auth_token);
-
             //check if the itemID is belong to the userID
             if (!itemID.Equals(GetAllItemsIDBelongToUser(auth_token).Where(x => x.Contains(itemID)).FirstOrDefault()))
                 return null;
@@ -578,6 +644,47 @@ namespace WCFServiceApp
             catch (Exception)
             {
                 return -1;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+        public static string SaveAllItemIdbyUsername(string username, Dictionary<string, decimal> itemIdList)
+        {
+            // Get userId from the userName
+            decimal userId = GetUserIdbyUserName(username);
+            int sucess;
+            // Get all item Id from Item table by userId
+            SqlConnection sqlConn = ObtainConnectionString();
+            string query = @"INSERT INTO Item VALUES (@userId, @itemId, @quantity)";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);                
+                command.Parameters.Add("@userId", SqlDbType.Decimal);
+                command.Parameters.Add("@itemId", SqlDbType.VarChar);
+                command.Parameters.Add("@quantity", SqlDbType.Decimal);
+                foreach (KeyValuePair<string, decimal> pair in itemIdList)
+                {
+                    command.Parameters["@userId"].Value = userId;
+                    command.Parameters["@itemId"].Value = pair.Key;
+                    command.Parameters["@quantity"].Value = pair.Value;
+
+                    sucess = command.ExecuteNonQuery();
+                    if (sucess == 0)
+                        return "Cannot insert multiple item";
+                }                
+                return "Sucess";               
+            }
+            catch (Exception ex)
+            {
+
+                return ex.Message;
             }
             finally
             {
