@@ -50,12 +50,12 @@ namespace WCFServiceApp
                         Balance = GetDecimalFromAccountTable("balance", username, passwordHash)
                     };
                 }
-                return new Player() { Username = "INVALID" };
+                return null;
 
             }
             catch (Exception)
             {
-                return new Player() { Username = "INVALID" };
+                return null;
             }
             finally
             {
@@ -66,6 +66,8 @@ namespace WCFServiceApp
 
         public static bool RegisterNewUser(string username, string passwordHash, string email)
         {
+            if (IsUserNameExistInAccount(username))
+                return false;
             SqlConnection sqlConn = ObtainConnectionString();
             string registerQuery = "INSERT INTO Account (userName, email, password)";
             registerQuery += " VALUES (@Username, @Email, @Password)";
@@ -81,6 +83,34 @@ namespace WCFServiceApp
                 }
                 return (registerCommand.ExecuteNonQuery() != 0);
 
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+        public static bool IsUserNameExistInAccount(string username)
+        {
+            SqlConnection sqlConn = ObtainConnectionString();
+            string query = @"SELECT userID FROM Account WHERE userName = @Username";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@Username", username);
+                SqlDataReader sqlDataReader = command.ExecuteReader();
+                decimal _userID = -1;
+                while (sqlDataReader.Read())
+                    _userID = sqlDataReader.GetDecimal(0);  // different than -1, meaning the user already exists
+                return (decimal.Compare(_userID, -1) != 0);
             }
             catch (Exception)
             {
