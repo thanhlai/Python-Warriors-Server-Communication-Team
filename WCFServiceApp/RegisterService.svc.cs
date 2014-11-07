@@ -21,25 +21,6 @@ namespace WCFServiceApp
         {
             return _SharedClass.RegisterNewUser(username, _SharedClass.HashPassword(password), email);
         }
-
-        /// <summary>
-        /// Return all item Id by user name.
-        /// </summary>
-        /// <param name="username"></param>        
-        /// <returns>List of all item Id belong to the user</returns>
-        List<string> IRegisterService.GetAllItemIdByUsername(string username)
-        {
-            return _SharedClass.GetAllItemIdByUsername(username);
-        }
-
-        /// <summary>
-        /// Save all item ids by user name
-        /// </summary>
-        /// <param name="username"></param>        
-        /// <returns>List of all item Id belong to the user</returns>
-        string IRegisterService.SaveAllItemIdByUsername(string username,Dictionary<string, decimal> itemIdList)
-        {
-            return _SharedClass.SaveAllItemIdbyUsername(username, itemIdList);
-        }
+        
     }
 }

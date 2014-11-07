@@ -47,5 +47,20 @@ namespace WCFServiceApp
         UriTemplate = "gameapi/getallavailableitems")]
         List<string> GetAllItemsIDBelongToUser();
 
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "gameapi/getallitemidbyusername")]
+        List<string> GetAllItemIdByUsername();
+
+        [OperationContract]
+        [WebInvoke(Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "gameapi/saveallitemidbyusername")]
+        bool SaveAllItemIdByUsername(Dictionary<string, decimal> itemIdList);
     }
 }

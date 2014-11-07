@@ -43,5 +43,29 @@ namespace WCFServiceApp
             string applicationheader = iwrc.Headers["X-Auth-Token"];
             return _SharedClass.GetAllItemsIDBelongToUser(applicationheader);
         }
+
+        /// <summary>
+        /// Return all item Id by user name.
+        /// </summary>
+        /// <param name="username"></param>        
+        /// <returns>List of all item Id belong to the user</returns>
+        List<string> IGameAPI.GetAllItemIdByUsername() 
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            return _SharedClass.GetAllItemIdByUsername(applicationheader);
+        }
+
+        /// <summary>
+        /// Save all item ids by user name
+        /// </summary>
+        /// <param name="username"></param>        
+        /// <returns>List of all item Id belong to the user</returns>
+        bool IGameAPI.SaveAllItemIdByUsername(Dictionary<string, decimal> itemIdList)
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            return _SharedClass.SaveAllItemIdbyUsername(applicationheader, itemIdList);
+        }
     }
 }
