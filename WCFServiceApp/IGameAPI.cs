@@ -62,5 +62,21 @@ namespace WCFServiceApp
             BodyStyle = WebMessageBodyStyle.Wrapped,
             UriTemplate = "gameapi/saveallitemidbyusername")]
         bool SaveAllItemIdByUsername(Dictionary<string, decimal> itemIdList);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "gameapi/getstagebycharname/{charname}")]
+        Byte[] GetStageByCharName(string charName);
+
+        [OperationContract]
+        [WebInvoke(Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "gameapi/savebalancebyuserid")]
+        bool SaveBalanceByUserId(decimal balance);
     }
 }
