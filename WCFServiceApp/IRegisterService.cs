@@ -18,6 +18,6 @@ namespace WCFServiceApp
             BodyStyle = WebMessageBodyStyle.Wrapped,
             UriTemplate = "/player")]
         bool RegisterNewUser(string username, string password, string email);
-
+        
     }
 }

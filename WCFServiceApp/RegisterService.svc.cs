@@ -21,5 +21,6 @@ namespace WCFServiceApp
         {
             return _SharedClass.RegisterNewUser(username, _SharedClass.HashPassword(password), email);
         }
+        
     }
 }
