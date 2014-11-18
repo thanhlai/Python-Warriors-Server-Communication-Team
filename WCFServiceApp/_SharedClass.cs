@@ -786,5 +786,65 @@ namespace WCFServiceApp
             }
         }
 
+        public static Byte[] GetStageByCharName(string auth_token, string charName)
+        {
+            decimal userId = GetUserIDInAuthToken(auth_token);
+            SqlConnection sqlConn = ObtainConnectionString();
+            string query = @"SELECT stage FROM Character WHERE userId = @userId AND charName = @charName";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@userId", userId);
+                command.Parameters.AddWithValue("@charName", charName);
+                Byte[] stage = new Byte[UInt16.MaxValue];
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                    stage = reader.GetSqlBinary(0).Value;
+                return stage;
+            }
+            catch (Exception)
+            {
+                
+                return new Byte[5];
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+        public static bool SaveBalanceByUserId(string auth_token, decimal balance)
+        {
+            decimal userId = GetUserIDInAuthToken(auth_token);
+            SqlConnection sqlConn = ObtainConnectionString();
+            string query = @"UPDATE Account SET balance = @balance WHERE userId = @userId";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@userId", userId);
+                command.Parameters.AddWithValue("@balance", balance);
+
+
+                return (command.ExecuteNonQuery() != 0);
+            }
+            catch (Exception)
+            {
+
+                return false;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
     }
 }
