@@ -9,9 +9,6 @@ Todo List (Remaining)
 ***************************
 + save user by ID
 + save base by charName/userID
-+ search for base by charName and userName
-+ save balance by userID
-+ get all charName
 + BIG:(second pic)
 
 

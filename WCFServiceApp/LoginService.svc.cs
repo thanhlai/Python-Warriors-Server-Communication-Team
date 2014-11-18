@@ -45,9 +45,6 @@ namespace WCFServiceApp
         string ILoginService.Login(string username, string password)
         {
             string theUsername = _SharedClass.LoginValidation(username, _SharedClass.HashPassword(password)).Username;
-
-            if (theUsername.Equals("INVALID"))
-                return null;
             return _SharedClass.GenerateAuthToken(username, password);
         }
     }
