@@ -20,7 +20,7 @@ namespace WCFServiceApp
         [WebInvoke(Method = "POST",
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json,
-            BodyStyle = WebMessageBodyStyle.Wrapped,
+            BodyStyle =  WebMessageBodyStyle.Wrapped,
             UriTemplate = "/login")]
         string Login(string username, string password);
 
@@ -29,7 +29,7 @@ namespace WCFServiceApp
         [WebInvoke(Method = "GET",
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json,
-            BodyStyle = WebMessageBodyStyle.Wrapped,
+            BodyStyle = WebMessageBodyStyle.Bare,
             UriTemplate = "player/{username}/{password}")]
         Player SendToLoginValidation(string username, string password);
 

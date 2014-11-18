@@ -16,7 +16,7 @@ namespace WCFServiceApp
         [WebInvoke(Method = "GET",
         RequestFormat = WebMessageFormat.Json,
         ResponseFormat = WebMessageFormat.Json,
-        BodyStyle = WebMessageBodyStyle.Wrapped,
+        BodyStyle = WebMessageBodyStyle.Bare,
         UriTemplate = "gameapi/getallavailablecharacternames")]
         List<string> GetAllAvailableCharacterNames();
 
@@ -25,7 +25,7 @@ namespace WCFServiceApp
         [WebInvoke(Method = "GET",
         RequestFormat = WebMessageFormat.Json,
         ResponseFormat = WebMessageFormat.Json,
-        BodyStyle = WebMessageBodyStyle.Wrapped,
+        BodyStyle = WebMessageBodyStyle.Bare,
         UriTemplate = "gameapi/getcharacter/{charName}")]
         Character GetCharacter(string charName);
 
@@ -33,7 +33,7 @@ namespace WCFServiceApp
         [WebInvoke(Method = "GET",
         RequestFormat = WebMessageFormat.Json,
         ResponseFormat = WebMessageFormat.Json,
-        BodyStyle = WebMessageBodyStyle.Wrapped,
+        BodyStyle = WebMessageBodyStyle.Bare,
         UriTemplate = "gameapi/getitem/{itemID}")]
         Item GetItem(string itemID);
 
@@ -43,7 +43,7 @@ namespace WCFServiceApp
         [WebInvoke(Method = "GET",
         RequestFormat = WebMessageFormat.Json,
         ResponseFormat = WebMessageFormat.Json,
-        BodyStyle = WebMessageBodyStyle.Wrapped,
+        BodyStyle = WebMessageBodyStyle.Bare,
         UriTemplate = "gameapi/getallavailableitems")]
         List<string> GetAllItemsIDBelongToUser();
 
@@ -51,7 +51,7 @@ namespace WCFServiceApp
         [WebInvoke(Method = "GET",
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json,
-            BodyStyle = WebMessageBodyStyle.Wrapped,
+            BodyStyle = WebMessageBodyStyle.Bare,
             UriTemplate = "gameapi/getallitemidbyusername")]
         List<string> GetAllItemIdByUsername();
 
@@ -59,7 +59,7 @@ namespace WCFServiceApp
         [WebInvoke(Method = "POST",
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json,
-            BodyStyle = WebMessageBodyStyle.Wrapped,
+            BodyStyle = WebMessageBodyStyle.Bare,
             UriTemplate = "gameapi/saveallitemidbyusername")]
         bool SaveAllItemIdByUsername(Dictionary<string, decimal> itemIdList);
     }
