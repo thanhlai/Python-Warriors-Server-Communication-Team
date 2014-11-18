@@ -7,6 +7,7 @@ using System.Net;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Json;
 using System.ServiceModel;
+using System.ServiceModel.Web;
 using System.Text;
 
 namespace WCFServiceApp
@@ -45,9 +46,6 @@ namespace WCFServiceApp
         string ILoginService.Login(string username, string password)
         {
             string theUsername = _SharedClass.LoginValidation(username, _SharedClass.HashPassword(password)).Username;
-
-            if (theUsername.Equals("INVALID"))
-                return null;
             return _SharedClass.GenerateAuthToken(username, password);
         }
     }

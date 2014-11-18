@@ -64,6 +64,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="GameAPI.svc" />
+    <Content Include="Global.asax" />
     <Content Include="LoginService.svc" />
     <Content Include="RegisterService.svc" />
     <Content Include="Web.config">
@@ -74,6 +75,9 @@
     <Compile Include="Character.cs" />
     <Compile Include="GameAPI.svc.cs">
       <DependentUpon>GameAPI.svc</DependentUpon>
+    </Compile>
+    <Compile Include="Global.asax.cs">
+      <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="IGameAPI.cs" />
     <Compile Include="IRegisterService.cs" />
