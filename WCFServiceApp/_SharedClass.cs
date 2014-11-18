@@ -816,5 +816,148 @@ namespace WCFServiceApp
             }
         }
 
+        public static List<string> SearchByCharName(string charName)
+        {            
+            SqlConnection sqlConn = ObtainConnectionString();
+            List<string> name = new List<string>();
+            string query = @"SELECT charName FROM Character WHERE charName LIKE '%' + @charName + '%' ";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@charName", charName);
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                    name.Add(reader.GetString(0));                
+                return name;                
+            }
+            catch (Exception ex)
+            {
+                name.Add(ex.Message);
+                return name;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+        public static List<string> SearchByUserName(string userName)
+        {
+            SqlConnection sqlConn = ObtainConnectionString();
+            List<string> name = new List<string>();
+            string query = @"SELECT userName FROM Account WHERE userName LIKE '%' + @userName + '%' ";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@userName", userName);
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                    name.Add(reader.GetString(0));
+                return name;
+            }
+            catch (Exception ex)
+            {
+                name.Add(ex.Message);
+                return name;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+        public static decimal SearchByUserNameCharName(string userName, string charName)
+        {
+            decimal userId = GetUserIdbyUserName(userName);
+            SqlConnection sqlConn = ObtainConnectionString();
+            decimal exp = -1;
+            string query = @"SELECT stageExp FROM Character WHERE userId = @userId AND charName = @charName";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@userId", userId);
+                command.Parameters.AddWithValue("@charName", charName);
+                SqlDataReader reader = command.ExecuteReader();                
+                while (reader.Read())
+                    exp = reader.GetDecimal(0);
+                return exp;
+            }
+            catch (Exception)
+            {
+                return -1;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+        //public static List<SearchCharacter> SearchCharacterByUserNameCharName(string userName, string charName)
+        //{
+        //    List<string> user = SearchByUserName(userName);
+        //    List<string> character = SearchByCharName(charName);
+        //    SqlConnection sqlConn = ObtainConnectionString();
+        //    List<SearchCharacter> searchCharacter = new List<SearchCharacter>();
+
+        //    foreach (string nameUser in user)
+        //    {
+        //        foreach (string nameChar in character)
+        //        {
+        //            if (SearchByUserNameCharName(nameUser, nameChar) != -1)
+        //            {
+        //                searchCharacter.Add(new SearchCharacter()
+        //                {
+        //                    UserName = nameUser,
+        //                    CharName = nameChar,
+        //                    Exp = SearchByUserNameCharName(nameUser, nameChar)
+        //                });
+        //            }
+        //        }
+        //    }
+        //    return searchCharacter;
+        //}
+
+        //public static List<SearchCharacter> SearchCharacterByUserNameCharName()
+        //{
+        //    string query = "SELECT (userId, charName, stageExp) FROM Character";
+        //    List<SearchCharacter> searchCharacters = new List<SearchCharacter>();       
+        //    using (SqlConnection conn = ObtainConnectionString())
+        //    {
+        //        SqlCommand command = new SqlCommand(query, conn);
+        //        SqlDataReader reader = command.ExecuteReader();
+        //        while (reader.Read())
+        //        {
+        //            searchCharacters.Add(new SearchCharacter()
+        //            {
+        //                UserName = reader.GetDecimal(0).ToString(),
+        //                CharName = reader.GetString(1),
+        //                Exp = reader.GetDecimal(2)
+        //            });
+        //        }
+        //    }
+        //    return searchCharacters;
+        //}
+
+        //public static List<SearchCharacter> SearchCharacterByUserNameCharName(string userName, string charName)
+        //{
+        //    string query;
+        //    if (string.IsNullOrEmpty(userName))
+        //    {
+        //        query = "SELECT (userId, charName, stageExp) FROM Character WHERE charName LIKE %"
+        //    }
+        //}
+
     }
 }

@@ -78,5 +78,14 @@ namespace WCFServiceApp
             BodyStyle = WebMessageBodyStyle.Wrapped,
             UriTemplate = "gameapi/savebalancebyuserid")]
         bool SaveBalanceByUserId(decimal balance);
+
+        //[OperationContract]
+        //[WebInvoke(Method = "GET",
+        //    RequestFormat = WebMessageFormat.Json,
+        //    ResponseFormat = WebMessageFormat.Json,
+        //    BodyStyle = WebMessageBodyStyle.Wrapped,
+        //    UriTemplate = "gameapi/searchcharacterbyusernamecharname/{username}/{charname}")]
+        //List<SearchCharacter> SearchCharacterByUserNameCharName(string username, string charname);
+        
     }
 }

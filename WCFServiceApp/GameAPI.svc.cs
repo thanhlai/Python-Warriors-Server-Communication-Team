@@ -86,5 +86,9 @@ namespace WCFServiceApp
             string applicationheader = iwrc.Headers["X-Auth-Token"];
             return _SharedClass.SaveBalanceByUserId(applicationheader, balance);
         }
+        //List<SearchCharacter> IGameAPI.SearchCharacterByUserNameCharName(string username, string charname)
+        //{
+        //    return _SharedClass.SearchCharacterByUserNameCharName(username, charname);
+        //}
     }
 }

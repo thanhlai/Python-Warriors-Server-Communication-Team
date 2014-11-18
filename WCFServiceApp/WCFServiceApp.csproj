@@ -87,6 +87,7 @@
     <Compile Include="RegisterService.svc.cs">
       <DependentUpon>RegisterService.svc</DependentUpon>
     </Compile>
+    <Compile Include="SearchCharacter.cs" />
     <Compile Include="_SharedClass.cs" />
   </ItemGroup>
   <ItemGroup>
