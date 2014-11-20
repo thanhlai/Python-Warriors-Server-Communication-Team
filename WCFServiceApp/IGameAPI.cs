@@ -52,7 +52,7 @@ namespace WCFServiceApp
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json,
             BodyStyle = WebMessageBodyStyle.Bare,
-            UriTemplate = "gameapi/getallitemidbyusername")]
+            UriTemplate = "gameapi/ ")]
         List<string> GetAllItemIdByUsername();
 
         [OperationContract]
@@ -79,13 +79,37 @@ namespace WCFServiceApp
             UriTemplate = "gameapi/savebalancebyuserid")]
         bool SaveBalanceByUserId(decimal balance);
 
-        //[OperationContract]
-        //[WebInvoke(Method = "GET",
-        //    RequestFormat = WebMessageFormat.Json,
-        //    ResponseFormat = WebMessageFormat.Json,
-        //    BodyStyle = WebMessageBodyStyle.Wrapped,
-        //    UriTemplate = "gameapi/searchcharacterbyusernamecharname/{username}/{charname}")]
-        //List<SearchCharacter> SearchCharacterByUserNameCharName(string username, string charname);
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "gameapi/searchcharacterbyusernamecharname/{username}/{charname}")]
+        List<SearchCharacter> SearchCharacterByUserNameCharName(string username, string charname);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "gameapi/searchcharacter")]
+        List<SearchCharacter> SearchCharacter();
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "gameapi/searchcharacterbyusername/{username}")]
+        List<SearchCharacter> SearchCharacterByUserName(string userName);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "gameapi/searchcharacterbycharname/{charname}")]
+        List<SearchCharacter> SearchCharacterByCharName(string charName);
         
     }
 }
