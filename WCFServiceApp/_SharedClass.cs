@@ -846,5 +846,149 @@ namespace WCFServiceApp
             }
         }
 
+        public static List<SearchCharacter> SearchCharacterByCharName(string charName)
+        {
+            SqlConnection sqlConn = ObtainConnectionString();
+            List<SearchCharacter> resultList = new List<SearchCharacter>();
+            string query = @"SELECT DISTINCT Account.userName, Character.charName, Character.stageExp FROM Character INNER JOIN Account ON Character.userId = Account.userId WHERE charName LIKE @charname ";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@charname", "%" + charName + "%");
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    resultList.Add(new SearchCharacter()
+                    {
+                        UserName = reader.GetString(0),
+                        CharName = reader.GetString(1),
+                        Exp = reader.GetDecimal(2)
+                    });
+                }
+
+                return resultList;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+        public static List<SearchCharacter> SearchCharacterByUserName(string userName)
+        {
+            SqlConnection sqlConn = ObtainConnectionString();
+            List<SearchCharacter> resultList = new List<SearchCharacter>();
+            string query = @"SELECT DISTINCT Account.userName, Character.charName, Character.stageExp FROM Character INNER JOIN Account ON Character.userId = Account.userId WHERE userName LIKE @username ";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@username", "%" + userName + "%");                
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    resultList.Add(new SearchCharacter()
+                    {
+                        UserName = reader.GetString(0),
+                        CharName = reader.GetString(1),
+                        Exp = reader.GetDecimal(2)
+                    });
+                }
+
+                return resultList;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+        public static List<SearchCharacter> SearchCharacterByUserNameCharName(string userName, string charName)
+        {            
+            SqlConnection sqlConn = ObtainConnectionString();
+            List<SearchCharacter> resultList = new List<SearchCharacter>();
+            string query = @"SELECT DISTINCT Account.userName, Character.charName, Character.stageExp FROM Character INNER JOIN Account ON Character.userId = Account.userId WHERE userName LIKE @username AND charName LIKE @charname ";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@username","%" + userName + "%");
+                command.Parameters.AddWithValue("@charname", "%" + charName + "%");
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    resultList.Add(new SearchCharacter()
+                    {
+                        UserName = reader.GetString(0),
+                        CharName = reader.GetString(1),
+                        Exp = reader.GetDecimal(2)
+                    });
+                }
+
+                return resultList;
+            }
+            catch (Exception)
+            {                
+                return null;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+        public static List<SearchCharacter> SearchCharacter()
+        {
+            SqlConnection sqlConn = ObtainConnectionString();
+            List<SearchCharacter> resultList = new List<SearchCharacter>();
+            string query = @"SELECT DISTINCT Account.userName, Character.charName, Character.stageExp FROM Character INNER JOIN Account ON Character.userId = Account.userId ";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);                
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    resultList.Add(new SearchCharacter()
+                    {
+                        UserName = reader.GetString(0),
+                        CharName = reader.GetString(1),
+                        Exp = reader.GetDecimal(2)
+                    });
+                }
+
+                return resultList;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
     }
 }
