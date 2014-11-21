@@ -13,9 +13,6 @@ namespace WCFServiceApp
     [ServiceContract(Namespace="WCFServiceApp/JSONData")]
     public interface ILoginService
     {
-
-
-
         [OperationContract]
         [WebInvoke(Method = "POST",
             RequestFormat = WebMessageFormat.Json,
