@@ -990,5 +990,77 @@ namespace WCFServiceApp
             }
         }
 
+
+        public static bool CreateNewCharacter(string auth_token, string charName, string character, string stage, decimal stageExp)
+        {
+            decimal userId = GetUserIDInAuthToken(auth_token);
+            SqlConnection sqlConn = ObtainConnectionString();
+            List<SearchCharacter> resultList = new List<SearchCharacter>();
+            string query = @"INSERT INTO Character VALUES (@charName, @userId, @character, @stage, @stageExp, @updated)";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+
+                command.Parameters.AddWithValue("@charName", charName);
+                command.Parameters.AddWithValue("@userId", userId);
+                command.Parameters.AddWithValue("@character", character);
+                command.Parameters.AddWithValue("@stage", stage);
+                command.Parameters.AddWithValue("@stageExp", stageExp);
+                command.Parameters.AddWithValue("@updated", DateTime.Now);
+
+
+                return (command.ExecuteNonQuery() != 0) ;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+        public static List<SCharacter> GetAllCharacter(string authToken)
+        {
+            decimal userId = GetUserIDInAuthToken(authToken);
+            SqlConnection sqlConn = ObtainConnectionString();
+            List<SCharacter> resultList = new List<SCharacter>();
+            string query = @"SELECT charName, character, stage, stageExp FROM Character WHERE userID = @userId";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@userId", userId);
+                SqlDataReader reader = command.ExecuteReader();              
+                while (reader.Read())
+                {                    
+                    resultList.Add(new SCharacter()
+                    {
+                        CharName = reader.GetString(0),
+                        CharacterObj = reader.GetString(1),
+                        Stage = reader.GetString(2),
+                        StageExp = reader.GetDecimal(3)
+                    });
+                }
+
+                return resultList;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }        
     }
 }

@@ -105,5 +105,19 @@ namespace WCFServiceApp
         {
             return _SharedClass.SearchCharacterByCharName(charName);
         }
+
+        bool IGameAPI.CreateNewCharacter(string charName, string character, string stage, decimal stageExp)
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            return _SharedClass.CreateNewCharacter(applicationheader, charName, character, stage, stageExp);
+        }
+        
+        List<SCharacter> IGameAPI.GetAllCharacter()
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            return _SharedClass.GetAllCharacter(applicationheader);
+        }
     }
 }
