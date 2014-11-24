@@ -52,7 +52,7 @@ namespace WCFServiceApp
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json,
             BodyStyle = WebMessageBodyStyle.Bare,
-            UriTemplate = "gameapi/ ")]
+            UriTemplate = "gameapi/getallitemidbyusername")]
         List<string> GetAllItemIdByUsername();
 
         [OperationContract]
@@ -110,6 +110,22 @@ namespace WCFServiceApp
             BodyStyle = WebMessageBodyStyle.Wrapped,
             UriTemplate = "gameapi/searchcharacterbycharname/{charname}")]
         List<SearchCharacter> SearchCharacterByCharName(string charName);
+       
+        [OperationContract]
+        [WebInvoke(Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "gameapi/createnewcharacter")]
+        bool CreateNewCharacter(string charName, string character, string stage, decimal stageExp);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "gameapi/getallcharacter")]
+        List<SCharacter> GetAllCharacter();
         
     }
 }
