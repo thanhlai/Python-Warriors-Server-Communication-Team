@@ -413,7 +413,10 @@ namespace WCFServiceApp
                 SqlDataReader sqlDataReader = command.ExecuteReader();
 
                 while (sqlDataReader.Read())
+                {
                     allItemIDs.Add(sqlDataReader.GetString(0));
+                }
+                    
                 return allItemIDs;
             }
             catch (Exception ex)
@@ -600,14 +603,14 @@ namespace WCFServiceApp
             }
         }
 
-        public static List<string> GetAllItemIdByUsername(string auth_token)
+        public static List<Item> GetAllItemByUserId(string auth_token)
         {            
             // Get userId from the userName
             decimal userId = GetUserIDInAuthToken(auth_token);
             // Get all item Id from Item table by userId
             SqlConnection sqlConn = ObtainConnectionString();
-            string query = @"SELECT itemId FROM Item WHERE userId = @userId";
-            List<string> allItemIds = new List<string>();
+            string query = @"SELECT itemId, quantity FROM Item WHERE userId = @userId";
+            List<Item> allItems = new List<Item>();
             try
             {
                 if (sqlConn.State == ConnectionState.Closed)
@@ -619,14 +622,18 @@ namespace WCFServiceApp
                 SqlDataReader sqlDataReader = command.ExecuteReader();
 
                 while (sqlDataReader.Read())
-                    allItemIds.Add(sqlDataReader.GetString(0));
-                return allItemIds;
+                    allItems.Add(new Item()
+                    {
+                        UserID = userId,
+                        ItemID = sqlDataReader.GetString(0),
+                        Quantity = sqlDataReader.GetDecimal(1)
+                    });
+                return allItems;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
-                allItemIds.Add("Exception: GetAllItemIdByUsername: " + ex.Message.ToString());
-                return allItemIds;
+                return null;
             }
             finally
             {
@@ -680,9 +687,8 @@ namespace WCFServiceApp
             }
         }
 
-        public static bool IsItemIdExistInUserId(string auth_token, string itemId)
-        {
-            decimal userId = GetUserIDInAuthToken(auth_token);
+        public static bool IsItemIdExistInUserId(decimal userId, string itemId)
+        {           
             SqlConnection sqlConn = ObtainConnectionString();
             bool isExist = false;
             string query = @"SELECT itemId FROM Item WHERE userID = @userId";
@@ -711,9 +717,8 @@ namespace WCFServiceApp
             }
         }
 
-        public static bool UpdateItemQuantityByAuthToken(string auth_token, string itemId, decimal quantity)
-        {
-            decimal userId = GetUserIDInAuthToken(auth_token); 
+        public static bool UpdateItemQuantityByAuthToken(decimal userId, string itemId, decimal quantity)
+        {           
             SqlConnection sqlConn = ObtainConnectionString();            
             string query = @"UPDATE Item SET quantity= @quantity WHERE userId = @userId AND itemId = @itemId";
             try
@@ -727,7 +732,7 @@ namespace WCFServiceApp
                 command.Parameters.AddWithValue("@itemId", itemId);
                 command.Parameters.AddWithValue("@quantity", quantity);
 
-                return (command.ExecuteNonQuery() != 0);               
+                return (command.ExecuteNonQuery() > 0);               
             }
             catch (Exception)
             {
@@ -739,45 +744,47 @@ namespace WCFServiceApp
             }
         }
 
-        public static bool SaveAllItemIdbyUsername(string auth_token, Dictionary<string, decimal> itemIdList)
+        public static bool SaveAllItemsByUserId(string auth_token, List<Item> itemList)
         {
             // Get userId from the userName
             decimal userId = GetUserIDInAuthToken(auth_token);
-            bool sucess;
             // Get all item Id from Item table by userId
             SqlConnection sqlConn = ObtainConnectionString();
-            string query = @"INSERT INTO Item VALUES (@userId, @itemId, @quantity)";
+            bool sucess;
+            string query = @"INSERT INTO Item VALUES (@userId, @itemId, @quantity);";
             try
             {
                 if (sqlConn.State == ConnectionState.Closed)
                 {
                     sqlConn.Open();     
                 }
-                SqlCommand command = new SqlCommand(query, sqlConn);                
+                SqlCommand command = new SqlCommand(query, sqlConn);
                 command.Parameters.Add("@userId", SqlDbType.Decimal);
                 command.Parameters.Add("@itemId", SqlDbType.VarChar);
                 command.Parameters.Add("@quantity", SqlDbType.Decimal);
-                foreach (KeyValuePair<string, decimal> pair in itemIdList)
-                {
-                    if (IsItemIdExistInUserId(auth_token, pair.Key))
+                foreach (Item item in itemList)
+                {                    
+                    if (IsItemIdExistInUserId(userId, item.ItemID))
                     {
-                        if (!UpdateItemQuantityByAuthToken(auth_token, pair.Key, pair.Value))
+                        if (!UpdateItemQuantityByAuthToken(userId, item.ItemID, item.Quantity))
                             return false;
                         continue;
-                    }                   
-                    command.Parameters["@userId"].Value = userId;
-                    command.Parameters["@itemId"].Value = pair.Key;
-                    command.Parameters["@quantity"].Value = pair.Value;
-                    
-                    sucess = command.ExecuteNonQuery() != 0;
-                    if (!sucess)
-                        return false;
+                    }
+                    else
+                    {
+                        command.Parameters["@userId"].Value = userId;
+                        command.Parameters["@itemId"].Value = item.ItemID;
+                        command.Parameters["@quantity"].Value = item.Quantity;
+
+                        sucess = command.ExecuteNonQuery() != 0;
+                        if (!sucess)
+                            return false;                        
+                    }                    
                 }
                 return true;
             }
             catch (Exception)
             {
-
                 return false;
             }
             finally
@@ -786,7 +793,7 @@ namespace WCFServiceApp
             }
         }
 
-        public static Byte[] GetStageByCharName(string auth_token, string charName)
+        public static string GetStageByCharName(string auth_token, string charName)
         {
             decimal userId = GetUserIDInAuthToken(auth_token);
             SqlConnection sqlConn = ObtainConnectionString();
@@ -800,16 +807,15 @@ namespace WCFServiceApp
                 SqlCommand command = new SqlCommand(query, sqlConn);
                 command.Parameters.AddWithValue("@userId", userId);
                 command.Parameters.AddWithValue("@charName", charName);
-                Byte[] stage = new Byte[UInt16.MaxValue];
+                string stage = "";
                 SqlDataReader reader = command.ExecuteReader();
                 while (reader.Read())
-                    stage = reader.GetSqlBinary(0).Value;
+                    stage = reader.GetString(0);
                 return stage;
             }
-            catch (Exception)
-            {
-                
-                return new Byte[5];
+            catch (Exception ex)
+            {                
+                return ex.Message;
             }
             finally
             {
@@ -1061,6 +1067,120 @@ namespace WCFServiceApp
             {
                 sqlConn.Close();
             }
-        }        
+        }
+
+        public static bool EditCharacter(string auth_token, string charName, string character, string stage, decimal stageExps)
+        {
+            SqlConnection sqlConn = ObtainConnectionString();
+            decimal userId = GetUserIDInAuthToken(auth_token);
+            string query = "UPDATE Character SET character = @character, stage = @stage, stageExp = @stageExp, updated = @updated WHERE userID = @userID AND charName = @charName";
+            try
+            {
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@charName", charName);
+                command.Parameters.AddWithValue("@character", character);
+                command.Parameters.AddWithValue("@stage", stage);
+                command.Parameters.AddWithValue("@stageExp", stageExps);
+                command.Parameters.AddWithValue("@updated", DateTime.Now);
+                command.Parameters.AddWithValue("@userID", userId);
+
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                return (command.ExecuteNonQuery() != 0);                   
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+        public static bool DeleteCharacter(string auth_token, string charName)
+        {
+            SqlConnection sqlConn = ObtainConnectionString();
+            decimal userId = GetUserIDInAuthToken(auth_token);
+            string query = "DELETE FROM Character WHERE userID = @userID AND charName = @charName";
+            try
+            {
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@userID", userId);
+                command.Parameters.AddWithValue("@charName", charName);
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                return (command.ExecuteNonQuery() != 0);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+        public static bool UpdateCharacterbyCharName(string auth_token, string charName, string character)
+        {
+            SqlConnection sqlConn = ObtainConnectionString();
+            decimal userId = GetUserIDInAuthToken(auth_token);
+            string query = "UPDATE Character SET character = @character WHERE userID = @userID AND charName = @charName";
+            try
+            {               
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@userId", userId);
+                command.Parameters.AddWithValue("@charName", charName);
+                command.Parameters.AddWithValue("@character", character);
+
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                return (command.ExecuteNonQuery() != 0);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+        public static bool UpdateStagebyCharName(string auth_token, string charName, string stage)
+        {
+            SqlConnection sqlConn = ObtainConnectionString();
+            decimal userId = GetUserIDInAuthToken(auth_token);
+            string query = "UPDATE Character SET stage = @stage WHERE userID = @userID AND charName = @charName";
+            try
+            {
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@userId", userId);
+                command.Parameters.AddWithValue("@charName", charName);
+                command.Parameters.AddWithValue("@stage", stage);
+
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                return (command.ExecuteNonQuery() != 0);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
     }
 }

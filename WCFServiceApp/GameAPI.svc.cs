@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
+using System.Web.Script.Serialization;
 
 namespace WCFServiceApp
 {
@@ -49,11 +51,11 @@ namespace WCFServiceApp
         /// </summary>
         /// <param name="username"></param>        
         /// <returns>List of all item Id belong to the user</returns>
-        List<string> IGameAPI.GetAllItemIdByUsername() 
+        List<Item> IGameAPI.GetAllItembyUserId()
         {
             IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
             string applicationheader = iwrc.Headers["X-Auth-Token"];
-            return _SharedClass.GetAllItemIdByUsername(applicationheader);
+            return _SharedClass.GetAllItemByUserId(applicationheader);
         }
 
         /// <summary>
@@ -61,11 +63,14 @@ namespace WCFServiceApp
         /// </summary>
         /// <param name="username"></param>        
         /// <returns>List of all item Id belong to the user</returns>
-        bool IGameAPI.SaveAllItemIdByUsername(Dictionary<string, decimal> itemIdList)
+        string IGameAPI.SaveAllItemsByUserId(string itemList)
         {
             IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
             string applicationheader = iwrc.Headers["X-Auth-Token"];
-            return _SharedClass.SaveAllItemIdbyUsername(applicationheader, itemIdList);
+            List<Item> items = JsonConvert.DeserializeObject<List<Item>>(itemList);
+            string temp = JsonConvert.SerializeObject(items, Formatting.Indented);
+            return temp;
+            //return _SharedClass.SaveAllItemsByUserId(applicationheader, items);
         }
 
         /// <summary>
@@ -73,7 +78,7 @@ namespace WCFServiceApp
         /// </summary>
         /// <param name="charname"></param>        
         /// <returns>List of all item Id belong to the user</returns>
-        Byte[] IGameAPI.GetStageByCharName(string charName)
+        string IGameAPI.GetStageByCharName(string charName)
         {
             IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
             string applicationheader = iwrc.Headers["X-Auth-Token"];
@@ -118,6 +123,34 @@ namespace WCFServiceApp
             IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
             string applicationheader = iwrc.Headers["X-Auth-Token"];
             return _SharedClass.GetAllCharacter(applicationheader);
+        }
+
+        bool IGameAPI.EditCharacter(string charName, string character, string stage, decimal stageExp)
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            return _SharedClass.EditCharacter(applicationheader, charName, character, stage, stageExp);
+        }
+
+        bool IGameAPI.DeleteCharacter(string charName)
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            return _SharedClass.DeleteCharacter(applicationheader, charName);
+        }
+
+        bool IGameAPI.UpdateCharacterByCharName(string charName, string character)
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            return _SharedClass.UpdateCharacterbyCharName(applicationheader, charName, character);
+        }
+
+        bool IGameAPI.UpdateStageByCharName(string charName, string stage)
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            return _SharedClass.UpdateStagebyCharName(applicationheader, charName, stage);
         }
     }
 }
