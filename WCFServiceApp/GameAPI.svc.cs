@@ -63,15 +63,15 @@ namespace WCFServiceApp
         /// </summary>
         /// <param name="username"></param>        
         /// <returns>List of all item Id belong to the user</returns>
-        string IGameAPI.SaveAllItemsByUserId(string itemList)
-        {
-            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
-            string applicationheader = iwrc.Headers["X-Auth-Token"];
-            List<Item> items = JsonConvert.DeserializeObject<List<Item>>(itemList);
-            string temp = JsonConvert.SerializeObject(items, Formatting.Indented);
-            return temp;
-            //return _SharedClass.SaveAllItemsByUserId(applicationheader, items);
-        }
+        //string IGameAPI.SaveAllItemsByUserId(string itemList)
+        //{
+        //    IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+        //    string applicationheader = iwrc.Headers["X-Auth-Token"];
+        //    List<Item> items = JsonConvert.DeserializeObject<List<Item>>(itemList);
+        //    string temp = JsonConvert.SerializeObject(items, Formatting.Indented);
+        //    return temp;
+        //    //return _SharedClass.SaveAllItemsByUserId(applicationheader, items);
+        //}
 
         /// <summary>
         /// Get the stage from character name
@@ -151,6 +151,43 @@ namespace WCFServiceApp
             IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
             string applicationheader = iwrc.Headers["X-Auth-Token"];
             return _SharedClass.UpdateStagebyCharName(applicationheader, charName, stage);
+        }
+
+
+        string IGameAPI.SaveAllItemsByUserId(string itemList)
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            // Use this on the client side laa
+            //var yourDictionary = new Dictionary<string,decimal>();
+            //var convertedDictionary = itemList.ToDictionary(item => item.Key.ToString(), item => item.Value.ToString());
+            //var json = new JavaScriptSerializer().Serialize(convertedDictionary);
+
+            string result = "";
+            Dictionary<string, object> dic =  DeserializeToDictionary(itemList);
+            foreach(KeyValuePair<string, object> temp in dic)
+            {
+                result += temp.Key + " : " + temp.Value + "\n";
+            }
+            return result;
+        }
+        //helper
+        private Dictionary<string, object> DeserializeToDictionary(string jo)
+        {
+            var values = JsonConvert.DeserializeObject<Dictionary<string, decimal>>(jo);
+            var values2 = new Dictionary<string, object>();
+            foreach (KeyValuePair<string, decimal> d in values)
+            {
+                if (d.Value.GetType().FullName.Contains("itemList"))
+                {
+                    values2.Add(d.Key, DeserializeToDictionary(d.Value.ToString()));
+                }
+                else
+                {
+                    values2.Add(d.Key, d.Value);
+                }
+            }
+            return values2;
         }
     }
 }
