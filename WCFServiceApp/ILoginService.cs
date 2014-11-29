@@ -30,5 +30,13 @@ namespace WCFServiceApp
             UriTemplate = "player/{username}/{password}")]
         Player SendToLoginValidation(string username, string password);
 
+        [OperationContract]
+        [WebInvoke(Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "/changepassword")]
+        // Change password
+        bool ChangePassword(string newPassword);
       }
 }
