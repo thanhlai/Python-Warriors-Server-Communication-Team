@@ -60,8 +60,8 @@ namespace WCFServiceApp
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json,
             BodyStyle = WebMessageBodyStyle.Bare,
-            UriTemplate = "gameapi/saveallitemsbyuserid")]
-        string SaveAllItemsByUserId(string itemList);
+            UriTemplate = "gameapi/saveitembyuserid")]
+        bool SaveItemByUserId(string itemid, decimal quantity);
 
         [OperationContract]
         [WebInvoke(Method = "GET",

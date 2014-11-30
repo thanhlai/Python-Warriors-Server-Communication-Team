@@ -63,14 +63,11 @@ namespace WCFServiceApp
         /// </summary>
         /// <param name="username"></param>        
         /// <returns>List of all item Id belong to the user</returns>
-        string IGameAPI.SaveAllItemsByUserId(string itemList)
+        bool IGameAPI.SaveItemByUserId(string itemid, decimal quantity)
         {
             IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
             string applicationheader = iwrc.Headers["X-Auth-Token"];
-            List<Item> items = JsonConvert.DeserializeObject<List<Item>>(itemList);
-            string temp = JsonConvert.SerializeObject(items, Formatting.Indented);
-            return temp;
-            //return _SharedClass.SaveAllItemsByUserId(applicationheader, items);
+            return _SharedClass.SaveItemByUserId(applicationheader, itemid, quantity);
         }
 
         /// <summary>

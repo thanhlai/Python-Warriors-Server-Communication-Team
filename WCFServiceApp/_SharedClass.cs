@@ -720,7 +720,7 @@ namespace WCFServiceApp
         public static bool UpdateItemQuantityByAuthToken(decimal userId, string itemId, decimal quantity)
         {           
             SqlConnection sqlConn = ObtainConnectionString();            
-            string query = @"UPDATE Item SET quantity= @quantity WHERE userId = @userId AND itemId = @itemId";
+            string query = @"UPDATE Item SET quantity= @quantity WHERE userID = @userId AND itemID = @itemId";
             try
             {
                 if (sqlConn.State == ConnectionState.Closed)
@@ -744,44 +744,31 @@ namespace WCFServiceApp
             }
         }
 
-        public static bool SaveAllItemsByUserId(string auth_token, List<Item> itemList)
+        public static bool SaveItemByUserId(string auth_token, string itemId, decimal quantity)
         {
-            // Get userId from the userName
             decimal userId = GetUserIDInAuthToken(auth_token);
-            // Get all item Id from Item table by userId
             SqlConnection sqlConn = ObtainConnectionString();
-            bool sucess;
-            string query = @"INSERT INTO Item VALUES (@userId, @itemId, @quantity);";
+            string query = @"INSERT INTO Item VALUES (@userID, @itemID, @quantity)";
             try
             {
                 if (sqlConn.State == ConnectionState.Closed)
                 {
-                    sqlConn.Open();     
+                    sqlConn.Open();
+                }
+                if (IsItemIdExistInUserId(userId, itemId))
+                {
+                    if (UpdateItemQuantityByAuthToken(userId, itemId, quantity))
+                    {
+                        return true;
+                    }
+                    else return false;
                 }
                 SqlCommand command = new SqlCommand(query, sqlConn);
-                command.Parameters.Add("@userId", SqlDbType.Decimal);
-                command.Parameters.Add("@itemId", SqlDbType.VarChar);
-                command.Parameters.Add("@quantity", SqlDbType.Decimal);
-                foreach (Item item in itemList)
-                {                    
-                    if (IsItemIdExistInUserId(userId, item.ItemID))
-                    {
-                        if (!UpdateItemQuantityByAuthToken(userId, item.ItemID, item.Quantity))
-                            return false;
-                        continue;
-                    }
-                    else
-                    {
-                        command.Parameters["@userId"].Value = userId;
-                        command.Parameters["@itemId"].Value = item.ItemID;
-                        command.Parameters["@quantity"].Value = item.Quantity;
+                command.Parameters.AddWithValue("@userId", userId);
+                command.Parameters.AddWithValue("@itemId", itemId);
+                command.Parameters.AddWithValue("@quantity", quantity);
 
-                        sucess = command.ExecuteNonQuery() != 0;
-                        if (!sucess)
-                            return false;                        
-                    }                    
-                }
-                return true;
+                return (command.ExecuteNonQuery() != 0);
             }
             catch (Exception)
             {
@@ -797,7 +784,7 @@ namespace WCFServiceApp
         {
             decimal userId = GetUserIDInAuthToken(auth_token);
             SqlConnection sqlConn = ObtainConnectionString();
-            string query = @"SELECT stage FROM Character WHERE userId = @userId AND charName = @charName";
+            string query = @"SELECT stage FROM Character WHERE userID = @userId AND charName = @charName";
             try
             {
                 if (sqlConn.State == ConnectionState.Closed)
