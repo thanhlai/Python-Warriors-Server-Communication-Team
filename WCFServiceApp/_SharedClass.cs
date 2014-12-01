@@ -64,7 +64,34 @@ namespace WCFServiceApp
             }
 
         }
+        public static bool ChangePassword(string auth_token, string newPassword)
+        {
+            //Retrieve userId from auth token table
+            decimal userID = GetUserIDInAuthToken(auth_token);
 
+            SqlConnection sqlConn = ObtainConnectionString();            
+            string query = @"UPDATE Account SET password= @NewPasswordHash WHERE userID = @userId";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@userId", userID);
+                command.Parameters.AddWithValue("@NewPasswordHash", newPassword);   //password is already hashed
+
+                return (command.ExecuteNonQuery() > 0);               
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
         public static bool RegisterNewUser(string username, string passwordHash, string email)
         {
             if (IsUserNameExistInAccount(username))

@@ -59,7 +59,7 @@ namespace WCFServiceApp
         [WebInvoke(Method = "POST",
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json,
-            BodyStyle = WebMessageBodyStyle.Bare,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
             UriTemplate = "gameapi/saveitembyuserid")]
         bool SaveItemByUserId(string itemid, decimal quantity);
 

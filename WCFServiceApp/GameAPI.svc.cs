@@ -63,12 +63,13 @@ namespace WCFServiceApp
         /// </summary>
         /// <param name="username"></param>        
         /// <returns>List of all item Id belong to the user</returns>
+
         bool IGameAPI.SaveItemByUserId(string itemid, decimal quantity)
         {
             IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
             string applicationheader = iwrc.Headers["X-Auth-Token"];
             return _SharedClass.SaveItemByUserId(applicationheader, itemid, quantity);
-        }
+        }        
 
         /// <summary>
         /// Get the stage from character name
@@ -148,6 +149,6 @@ namespace WCFServiceApp
             IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
             string applicationheader = iwrc.Headers["X-Auth-Token"];
             return _SharedClass.UpdateStagebyCharName(applicationheader, charName, stage);
-        }
+        }      
     }
 }
