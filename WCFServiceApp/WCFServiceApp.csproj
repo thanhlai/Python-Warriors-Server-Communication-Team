@@ -91,6 +91,7 @@
     <Compile Include="RegisterService.svc.cs">
       <DependentUpon>RegisterService.svc</DependentUpon>
     </Compile>
+    <Compile Include="SCharacter.cs" />
     <Compile Include="SearchCharacter.cs" />
     <Compile Include="_SharedClass.cs" />
   </ItemGroup>
@@ -99,6 +100,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="packages.config" />
+    <None Include="Properties\PublishProfiles\Deploy.pubxml" />
     <None Include="Properties\PublishProfiles\WCF.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>

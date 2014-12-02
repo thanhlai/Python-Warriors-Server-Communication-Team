@@ -52,16 +52,16 @@ namespace WCFServiceApp
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json,
             BodyStyle = WebMessageBodyStyle.Bare,
-            UriTemplate = "gameapi/ ")]
-        List<string> GetAllItemIdByUsername();
+            UriTemplate = "gameapi/getallitemsbyuserid")]
+        List<Item> GetAllItembyUserId();
 
         [OperationContract]
         [WebInvoke(Method = "POST",
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json,
             BodyStyle = WebMessageBodyStyle.Bare,
-            UriTemplate = "gameapi/saveallitemidbyusername")]
-        bool SaveAllItemIdByUsername(Dictionary<string, decimal> itemIdList);
+            UriTemplate = "gameapi/saveallitemsbyuserid")]
+        string SaveAllItemsByUserId(string itemList);
 
         [OperationContract]
         [WebInvoke(Method = "GET",
@@ -69,7 +69,7 @@ namespace WCFServiceApp
             ResponseFormat = WebMessageFormat.Json,
             BodyStyle = WebMessageBodyStyle.Wrapped,
             UriTemplate = "gameapi/getstagebycharname/{charname}")]
-        Byte[] GetStageByCharName(string charName);
+        string GetStageByCharName(string charName);
 
         [OperationContract]
         [WebInvoke(Method = "POST",
@@ -110,6 +110,53 @@ namespace WCFServiceApp
             BodyStyle = WebMessageBodyStyle.Wrapped,
             UriTemplate = "gameapi/searchcharacterbycharname/{charname}")]
         List<SearchCharacter> SearchCharacterByCharName(string charName);
-        
+       
+        [OperationContract]
+        [WebInvoke(Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "gameapi/createnewcharacter")]
+        bool CreateNewCharacter(string charName, string character, string stage, decimal stageExp);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "gameapi/getallcharacter")]
+        List<SCharacter> GetAllCharacter();
+
+        [OperationContract]
+        [WebInvoke(Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "gameapi/editcharacter")]
+        bool EditCharacter(string charName, string character, string stage, decimal stageExp);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "gameapi/deletecharacter/{charName}")]
+        bool DeleteCharacter(string charName);
+
+        [OperationContract]
+        [WebInvoke(Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "gameapi/updatecharacterbycharname")]
+        bool UpdateCharacterByCharName(string charName, string character);
+
+        [OperationContract]
+        [WebInvoke(Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "gameapi/updatestagebycharname")]
+        bool UpdateStageByCharName(string charName, string stage);
     }
 }

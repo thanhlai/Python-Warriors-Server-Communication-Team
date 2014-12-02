@@ -48,5 +48,13 @@ namespace WCFServiceApp
             string theUsername = _SharedClass.LoginValidation(username, _SharedClass.HashPassword(password)).Username;
             return _SharedClass.GenerateAuthToken(username, password);
         }
+
+
+        bool ILoginService.ChangePassword(string newPassword)
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            return _SharedClass.ChangePassword(applicationheader, _SharedClass.HashPassword(newPassword));
+        }
     }
 }

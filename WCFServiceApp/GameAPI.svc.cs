@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
+using System.Web.Script.Serialization;
 
 namespace WCFServiceApp
 {
@@ -49,11 +51,11 @@ namespace WCFServiceApp
         /// </summary>
         /// <param name="username"></param>        
         /// <returns>List of all item Id belong to the user</returns>
-        List<string> IGameAPI.GetAllItemIdByUsername() 
+        List<Item> IGameAPI.GetAllItembyUserId()
         {
             IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
             string applicationheader = iwrc.Headers["X-Auth-Token"];
-            return _SharedClass.GetAllItemIdByUsername(applicationheader);
+            return _SharedClass.GetAllItemByUserId(applicationheader);
         }
 
         /// <summary>
@@ -61,19 +63,22 @@ namespace WCFServiceApp
         /// </summary>
         /// <param name="username"></param>        
         /// <returns>List of all item Id belong to the user</returns>
-        bool IGameAPI.SaveAllItemIdByUsername(Dictionary<string, decimal> itemIdList)
-        {
-            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
-            string applicationheader = iwrc.Headers["X-Auth-Token"];
-            return _SharedClass.SaveAllItemIdbyUsername(applicationheader, itemIdList);
-        }
+        //string IGameAPI.SaveAllItemsByUserId(string itemList)
+        //{
+        //    IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+        //    string applicationheader = iwrc.Headers["X-Auth-Token"];
+        //    List<Item> items = JsonConvert.DeserializeObject<List<Item>>(itemList);
+        //    string temp = JsonConvert.SerializeObject(items, Formatting.Indented);
+        //    return temp;
+        //    //return _SharedClass.SaveAllItemsByUserId(applicationheader, items);
+        //}
 
         /// <summary>
         /// Get the stage from character name
         /// </summary>
         /// <param name="charname"></param>        
         /// <returns>List of all item Id belong to the user</returns>
-        Byte[] IGameAPI.GetStageByCharName(string charName)
+        string IGameAPI.GetStageByCharName(string charName)
         {
             IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
             string applicationheader = iwrc.Headers["X-Auth-Token"];
@@ -104,6 +109,85 @@ namespace WCFServiceApp
         List<SearchCharacter> IGameAPI.SearchCharacterByCharName(string charName)
         {
             return _SharedClass.SearchCharacterByCharName(charName);
+        }
+
+        bool IGameAPI.CreateNewCharacter(string charName, string character, string stage, decimal stageExp)
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            return _SharedClass.CreateNewCharacter(applicationheader, charName, character, stage, stageExp);
+        }
+        
+        List<SCharacter> IGameAPI.GetAllCharacter()
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            return _SharedClass.GetAllCharacter(applicationheader);
+        }
+
+        bool IGameAPI.EditCharacter(string charName, string character, string stage, decimal stageExp)
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            return _SharedClass.EditCharacter(applicationheader, charName, character, stage, stageExp);
+        }
+
+        bool IGameAPI.DeleteCharacter(string charName)
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            return _SharedClass.DeleteCharacter(applicationheader, charName);
+        }
+
+        bool IGameAPI.UpdateCharacterByCharName(string charName, string character)
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            return _SharedClass.UpdateCharacterbyCharName(applicationheader, charName, character);
+        }
+
+        bool IGameAPI.UpdateStageByCharName(string charName, string stage)
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            return _SharedClass.UpdateStagebyCharName(applicationheader, charName, stage);
+        }
+
+
+        string IGameAPI.SaveAllItemsByUserId(string itemList)
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            // Use this on the client side laa
+            //var yourDictionary = new Dictionary<string,decimal>();
+            //var convertedDictionary = itemList.ToDictionary(item => item.Key.ToString(), item => item.Value.ToString());
+            //var json = new JavaScriptSerializer().Serialize(convertedDictionary);
+
+            string result = "";
+            Dictionary<string, object> dic =  DeserializeToDictionary(itemList);
+            foreach(KeyValuePair<string, object> temp in dic)
+            {
+                result += temp.Key + " : " + temp.Value + "\n";
+            }
+            return result;
+        }
+        //helper
+        private Dictionary<string, object> DeserializeToDictionary(string jo)
+        {
+            var values = JsonConvert.DeserializeObject<Dictionary<string, decimal>>(jo);
+            var values2 = new Dictionary<string, object>();
+            foreach (KeyValuePair<string, decimal> d in values)
+            {
+                if (d.Value.GetType().FullName.Contains("itemList"))
+                {
+                    values2.Add(d.Key, DeserializeToDictionary(d.Value.ToString()));
+                }
+                else
+                {
+                    values2.Add(d.Key, d.Value);
+                }
+            }
+            return values2;
         }
     }
 }
