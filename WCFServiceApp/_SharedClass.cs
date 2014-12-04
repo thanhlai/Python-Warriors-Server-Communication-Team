@@ -742,7 +742,7 @@ namespace WCFServiceApp
             {
                 sqlConn.Close();
             }
-        }
+        }        
 
         public static bool UpdateItemQuantityByAuthToken(decimal userId, string itemId, decimal quantity)
         {           
@@ -807,6 +807,66 @@ namespace WCFServiceApp
             }
         }
 
+        public static bool SaveItemByCharName(string auth_token, string charName, string item)
+        {
+            decimal userId = GetUserIDInAuthToken(auth_token);
+            SqlConnection sqlConn = ObtainConnectionString();
+            string query = @"UPDATE Character SET item = @item WHERE userID = @userID AND charName = @charName";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }                
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@userID", userId);
+                command.Parameters.AddWithValue("@charName", charName);
+                command.Parameters.AddWithValue("@item", item);
+
+                return (command.ExecuteNonQuery() != 0);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }        
+
+        public static string GetItemByCharName(string auth_token, string charName)
+        {
+            decimal userId = GetUserIDInAuthToken(auth_token);
+            SqlConnection sqlConn = ObtainConnectionString();
+            string query = @"SELECT item FROM Character WHERE userID = @userId AND charName = @charName";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@userId", userId);
+                command.Parameters.AddWithValue("@charName", charName);
+                string item = "";
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                {
+                    item = reader.GetString(0);
+                }
+                return item;
+            }             
+            catch (Exception)
+            {
+                return null;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
         public static string GetStageByCharName(string auth_token, string charName)
         {
             decimal userId = GetUserIDInAuthToken(auth_token);
@@ -829,6 +889,36 @@ namespace WCFServiceApp
             }
             catch (Exception ex)
             {                
+                return ex.Message;
+            }
+            finally
+            {
+                sqlConn.Close();
+            }
+        }
+
+        public static string GetStageByUserNameCharName(string userName, string charName)
+        {
+            decimal userId = GetUserIdbyUserName(userName);
+            SqlConnection sqlConn = ObtainConnectionString();
+            string query = @"SELECT stage FROM Character WHERE userID = @userId AND charName = @charName";
+            try
+            {
+                if (sqlConn.State == ConnectionState.Closed)
+                {
+                    sqlConn.Open();
+                }
+                SqlCommand command = new SqlCommand(query, sqlConn);
+                command.Parameters.AddWithValue("@userId", userId);
+                command.Parameters.AddWithValue("@charName", charName);
+                string stage = "";
+                SqlDataReader reader = command.ExecuteReader();
+                while (reader.Read())
+                    stage = reader.GetString(0);
+                return stage;
+            }
+            catch (Exception ex)
+            {
                 return ex.Message;
             }
             finally
@@ -1016,7 +1106,7 @@ namespace WCFServiceApp
             decimal userId = GetUserIDInAuthToken(auth_token);
             SqlConnection sqlConn = ObtainConnectionString();
             List<SearchCharacter> resultList = new List<SearchCharacter>();
-            string query = @"INSERT INTO Character VALUES (@charName, @userId, @character, @stage, @stageExp, @updated)";
+            string query = @"INSERT INTO Character (charName, userID, character, stage, stageExp, updated) VALUES (@charName, @userId, @character, @stage, @stageExp, @updated)";
             try
             {
                 if (sqlConn.State == ConnectionState.Closed)
@@ -1033,7 +1123,7 @@ namespace WCFServiceApp
                 command.Parameters.AddWithValue("@updated", DateTime.Now);
 
 
-                return (command.ExecuteNonQuery() != 0) ;
+                return (command.ExecuteNonQuery() != 0) ;               
             }
             catch (Exception)
             {

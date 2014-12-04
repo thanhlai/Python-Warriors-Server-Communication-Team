@@ -72,6 +72,14 @@ namespace WCFServiceApp
         string GetStageByCharName(string charName);
 
         [OperationContract]
+        [WebInvoke(Method = "GET",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "gameapi/getstagebyusernamecharname/{username}/{charname}")]
+        string GetStageByUserNameCharName(string userName, string charName);
+
+        [OperationContract]
         [WebInvoke(Method = "POST",
             RequestFormat = WebMessageFormat.Json,
             ResponseFormat = WebMessageFormat.Json,
@@ -158,5 +166,23 @@ namespace WCFServiceApp
             BodyStyle = WebMessageBodyStyle.Wrapped,
             UriTemplate = "gameapi/updatestagebycharname")]
         bool UpdateStageByCharName(string charName, string stage);
+
+        [OperationContract]
+        [WebInvoke(Method = "POST",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "gameapi/saveitembycharname")]
+        bool SaveItemByCharName(string charName, string item);
+
+        [OperationContract]
+        [WebInvoke(Method = "GET",
+            RequestFormat = WebMessageFormat.Json,
+            ResponseFormat = WebMessageFormat.Json,
+            BodyStyle = WebMessageBodyStyle.Wrapped,
+            UriTemplate = "gameapi/getitembycharname/{charname}")]
+        string GetItemByCharName(string charName);
+
+
     }
 }

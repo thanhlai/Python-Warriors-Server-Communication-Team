@@ -83,6 +83,11 @@ namespace WCFServiceApp
             return _SharedClass.GetStageByCharName(applicationheader, charName);
         }
 
+        string IGameAPI.GetStageByUserNameCharName(string userName, string charName)
+        {
+            return _SharedClass.GetStageByUserNameCharName(userName, charName);
+        }
+
         bool IGameAPI.SaveBalanceByUserId(decimal balance)
         {
             IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
@@ -149,6 +154,20 @@ namespace WCFServiceApp
             IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
             string applicationheader = iwrc.Headers["X-Auth-Token"];
             return _SharedClass.UpdateStagebyCharName(applicationheader, charName, stage);
-        }      
+        }
+
+        bool IGameAPI.SaveItemByCharName(string charName, string item)
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            return _SharedClass.SaveItemByCharName(applicationheader, charName, item);
+        }
+
+        string IGameAPI.GetItemByCharName(string charName)
+        {
+            IncomingWebRequestContext iwrc = WebOperationContext.Current.IncomingRequest;
+            string applicationheader = iwrc.Headers["X-Auth-Token"];
+            return _SharedClass.GetItemByCharName(applicationheader, charName);
+        }
     }
 }
